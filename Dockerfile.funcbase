@@ -1,0 +1,1 @@
+FROM mcr.microsoft.com/azure-functions/node:4-node20-appservice

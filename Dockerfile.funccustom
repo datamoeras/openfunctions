@@ -1,0 +1,25 @@
+# ARG TAG=latest
+FROM mcr.microsoft.com/azure-functions/node:4-node20-appservice AS ms
+FROM debian:trixie
+
+ENV FUNCTIONS_WORKER_RUNTIME=node
+ENV AzureWebJobsScriptRoot=/home/site/wwwroot HOME=/home DOTNET_USE_POLLING_FILE_WATCHER=true HOST_VERSION=4.1040.300.7 ASPNETCORE_CONTENTROOT=/azure-functions-host
+ENV ASPNET_VERSION=6.0.36
+ENV DOTNET_VERSION=6.0.36
+ENV ASPNETCORE_URLS=http://+:80 DOTNET_RUNNING_IN_CONTAINER=true
+COPY --from=ms /azure-functions-host /azure-functions-host 
+COPY --from=ms /opt /opt
+COPY --from=ms /home /home
+COPY --from=ms /FuncExtensionBundles /FuncExtensionBundles
+COPY --from=ms /usr/local/share/ca-certificates/ /usr/local/share/ca-certificates/
+COPY --from=ms /usr/share/dotnet /usr/share/dotnet
+RUN ln -s /usr/share/dotnet/dotnet /usr/bin/dotnet
+RUN apt-get update && apt-get install -y libicu76 nodejs npm 
+# RUN RUN bash /root/setup_20.x
+RUN npm install -g bun pnpm
+ADD azurite-start /azurite-start
+ENV SSHD_PORT=2222
+EXPOSE 80
+EXPOSE 2222
+CMD ["/opt/startup/start_nonappservice.sh"]
+ENTRYPOINT /azurite-start /azure-functions-host/start.sh

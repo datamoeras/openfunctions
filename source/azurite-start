@@ -1,0 +1,12 @@
+#!/bin/bash
+
+cd /home/site/wwwroot
+npx azurite &
+pid=$!
+
+$@
+ex=$?
+
+kill $pid 2>/dev/null
+exit $ex
+

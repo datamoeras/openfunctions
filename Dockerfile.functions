@@ -1,0 +1,16 @@
+ARG TAG=latest
+FROM openfunccustom:$TAG
+ARG TAG
+
+ENV AzureWebJobsScriptRoot=/home/site/wwwroot \
+    AzureFunctionsJobHost__Logging__Console__IsEnabled=true 
+
+WORKDIR /home/site/wwwroot
+
+# Copy package.json and install packages before copying the rest of the code to enable caching
+COPY package.json package.json
+RUN bun i
+
+COPY . .
+RUN mkdir -p /shared/tmp/system /shared/cache
+RUN echo $TAG > /etc/docker-image-version
