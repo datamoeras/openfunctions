@@ -7,10 +7,10 @@ const fs = require('node:fs/promises')
 
 app.http('HttpExample', {
     methods: ['GET', 'POST'],
-    authLevel: 'function',
+    authLevel: 'anonymous',
     handler: async (request, context) => {
         context.log(`Http function processed request for url "${request.url}"`);
-        return { body: { hello: "world"} };
+        return { body: JSON.stringify({ hello: "world"}, null, 2), headers: { 'Content-Type': 'application/json' } };
     }
 });
 
